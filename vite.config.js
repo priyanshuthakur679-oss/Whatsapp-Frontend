@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         "/api": {
-          target: "https://whatsapp-backend.onrender.com",
+          target: "https://whatsapp-backend.onrender.com/api",
           changeOrigin: true,
           secure: false,
         },
