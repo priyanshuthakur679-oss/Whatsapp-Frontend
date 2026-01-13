@@ -9,10 +9,11 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         "/api": {
-          target: env.VITE_API_URL,
+          target: "https://whatsapp-backend.onrender.com",
           changeOrigin: true,
-        }
-      }
-    }
+          secure: false,
+        },
+      },
+    },
   };
 });
