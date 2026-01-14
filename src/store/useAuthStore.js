@@ -11,7 +11,7 @@ export const useAuthStore = create((set, get) => ({
   isCheckingAuth: true,
   onlineUsers: [],
   socket, // singleton socket
-  token: null, // Store token in state
+  token: localStorage.getItem("jwt_token") || null, // Load token from localStorage on init
 
   checkAuth: async () => {
     try {
@@ -21,6 +21,7 @@ export const useAuthStore = create((set, get) => ({
     } catch (error) {
       console.error("Error in checkAuth:", error);
       set({ authUser: null, token: null });
+      localStorage.removeItem("jwt_token");
     } finally {
       set({ isCheckingAuth: false });
     }
@@ -31,7 +32,10 @@ export const useAuthStore = create((set, get) => ({
     try {
       const res = await axiosInstance.post("/auth/signup", data);
       const userData = res?.data?.user || null;
-      set({ authUser: userData, token: res?.data?.token });
+      const token = res?.data?.token;
+      set({ authUser: userData, token });
+      // Store token in localStorage
+      if (token) localStorage.setItem("jwt_token", token);
       toast.success("Account created successfully");
       if (userData?._id) connectSocket(userData._id, (users) => set({ onlineUsers: users }));
     } catch (error) {
@@ -46,7 +50,10 @@ export const useAuthStore = create((set, get) => ({
     try {
       const res = await axiosInstance.post("/auth/login", data);
       const userData = res?.data?.user || null;
-      set({ authUser: userData, token: res?.data?.token });
+      const token = res?.data?.token;
+      set({ authUser: userData, token });
+      // Store token in localStorage
+      if (token) localStorage.setItem("jwt_token", token);
       toast.success("Logged in successfully");
       if (userData?._id) connectSocket(userData._id, (users) => set({ onlineUsers: users }));
     } catch (error) {
@@ -61,6 +68,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       await axiosInstance.post("/auth/logout");
       set({ authUser: null, token: null, onlineUsers: [] });
+      localStorage.removeItem("jwt_token");
       toast.success("Logged out successfully");
       if (socket?.connected) socket.disconnect();
     } catch (error) {

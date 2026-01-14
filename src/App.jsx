@@ -21,6 +21,11 @@ const App = () => {
   console.log({ onlineUsers });
 
   useEffect(() => {
+    // Restore token from localStorage and check auth
+    const token = localStorage.getItem("jwt_token");
+    if (token) {
+      useAuthStore.setState({ token });
+    }
     checkAuth();
   }, [checkAuth]);
 
