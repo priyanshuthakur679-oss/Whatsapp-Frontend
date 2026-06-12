@@ -90,6 +90,67 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  // Forgot password: send reset email
+  isSendingReset: false,
+  forgotPassword: async (email) => {
+    set({ isSendingReset: true });
+    try {
+      await axiosInstance.post("/auth/forgot-password", { email });
+      toast.success("If that email exists, a reset link was sent.");
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      toast.error(error.response?.data?.message || "Failed to send reset email");
+    } finally {
+      set({ isSendingReset: false });
+    }
+  },
+
+  // Reset password using token
+  isResettingPassword: false,
+  resetPassword: async (token, password) => {
+    set({ isResettingPassword: true });
+    try {
+      const res = await axiosInstance.post(`/auth/reset-password/${token}`, { password });
+      const newToken = res?.data?.token;
+      if (newToken) {
+        set({ token: newToken });
+        localStorage.setItem("jwt_token", newToken);
+        // Refresh auth user
+        await get().checkAuth();
+      }
+      toast.success("Password reset successfully");
+      return true;
+    } catch (error) {
+      console.error("Reset password error:", error);
+      toast.error(error.response?.data?.message || "Failed to reset password");
+      return false;
+    } finally {
+      set({ isResettingPassword: false });
+    }
+  },
+  // Change password while logged in (requires current password)
+  isChangingPassword: false,
+  changePassword: async (currentPassword, newPassword) => {
+    set({ isChangingPassword: true });
+    try {
+      const res = await axiosInstance.put("/auth/change-password", { currentPassword, newPassword });
+      const newToken = res?.data?.token;
+      if (newToken) {
+        set({ token: newToken });
+        localStorage.setItem("jwt_token", newToken);
+        await get().checkAuth();
+      }
+      toast.success("Password changed successfully");
+      return true;
+    } catch (error) {
+      console.error("Change password error:", error);
+      toast.error(error.response?.data?.message || "Failed to change password");
+      return false;
+    } finally {
+      set({ isChangingPassword: false });
+    }
+  },
+
   disconnectSocket: () => {
     if (socket?.connected) socket.disconnect();
   },

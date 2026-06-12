@@ -2,7 +2,7 @@ import axios from "axios";
 import { useAuthStore } from "../store/useAuthStore.js";
 
 export const axiosInstance = axios.create({
-  baseURL: "https://whatsapp-backend-1-8yec.onrender.com/api",
+  baseURL: "http://localhost:5000/api" || "https://whatsapp-backend-1-8yec.onrender.com/api" ,
   withCredentials: true,
 });
 

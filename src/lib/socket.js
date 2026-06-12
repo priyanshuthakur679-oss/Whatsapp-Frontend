@@ -1,7 +1,10 @@
 import { io } from "socket.io-client";
 
+// Determine socket server URL (use Vite env var `VITE_API_URL` if provided)
+const SOCKET_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/api\/?$/, "") : "http://localhost:5000";
+
 // Single socket instance
-const socket = io("/", {
+const socket = io(SOCKET_URL, {
   path: "/socket.io",
   transports: ["websocket", "polling"],
   withCredentials: true,

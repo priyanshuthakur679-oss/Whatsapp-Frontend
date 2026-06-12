@@ -83,6 +83,11 @@ const LoginPage = () => {
                   )}
                 </button>
               </div>
+              <div className="mt-2 text-right">
+                <Link to="/forgot-password" className="link link-primary text-sm">
+                  Forgot password?
+                </Link>
+              </div>
             </div>
 
             <button type="submit" className="btn btn-primary w-full" disabled={isLoggingIn}>

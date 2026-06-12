@@ -1,5 +1,5 @@
 import { useChatStore } from "../store/useChatStore";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
@@ -18,6 +18,8 @@ const ChatContainer = () => {
   } = useChatStore();
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [viewerSrc, setViewerSrc] = useState("");
 
   useEffect(() => {
     getMessages(selectedUser._id);
@@ -44,6 +46,7 @@ const ChatContainer = () => {
   }
 
   return (
+    <>
     <div className="flex-1 flex flex-col overflow-auto">
       <ChatHeader />
 
@@ -76,7 +79,11 @@ const ChatContainer = () => {
                 <img
                   src={message.image}
                   alt="Attachment"
-                  className="sm:max-w-[200px] rounded-md mb-2"
+                  className="sm:max-w-[200px] rounded-md mb-2 cursor-zoom-in"
+                  onClick={() => {
+                    setViewerSrc(message.image);
+                    setViewerOpen(true);
+                  }}
                 />
               )}
               {message.text && <p>{message.text}</p>}
@@ -87,6 +94,15 @@ const ChatContainer = () => {
 
       <MessageInput />
     </div>
+      {viewerOpen && (
+        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center" onClick={() => setViewerOpen(false)}>
+          <button className="absolute top-4 right-4 btn btn-ghost btn-circle" onClick={() => setViewerOpen(false)} aria-label="Close">
+            ✕
+          </button>
+          <img src={viewerSrc} alt="Full" className="max-w-full max-h-full object-contain" onClick={(e) => e.stopPropagation()} />
+        </div>
+      )}
+    </>
   );
 };
 export default ChatContainer;
